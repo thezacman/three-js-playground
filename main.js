@@ -1,19 +1,15 @@
 import * as THREE from 'three';
-
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 THREE.Cache.enabled = true;
 
 let container;
 let camera, cameraTarget, scene, renderer;
 let group, textMesh1, textMesh2, textGeo, materials;
-let firstLetter = true;
-let text = 'three.js',
+let text = 'Some 3D Text',
   bevelEnabled = true,
-  font = undefined,
+  font = null,
   fontName = 'optimer', // helvetiker, optimer, gentilis, droid sans, droid serif
   fontWeight = 'bold'; // normal bold
 const depth = 20,
@@ -22,30 +18,12 @@ const depth = 20,
   curveSegments = 4,
   bevelThickness = 2,
   bevelSize = 1.5;
-const mirror = true;
-const fontMap = {
-  'helvetiker': 0,
-  'optimer': 1,
-  'gentilis': 2,
-  'droid/droid_sans': 3,
-  'droid/droid_serif': 4
-};
-const weightMap = {
-  'regular': 0,
-  'bold': 1
-};
-const reverseFontMap = [];
-const reverseWeightMap = [];
-
-for (const i in fontMap) reverseFontMap[fontMap[i]] = i;
-for (const i in weightMap) reverseWeightMap[weightMap[i]] = i;
-
+const mirror = false;
 let targetRotation = 0;
 let targetRotationOnPointerDown = 0;
 let pointerX = 0;
 let pointerXOnPointerDown = 0;
 let windowHalfX = window.innerWidth / 2;
-let fontIndex = 1;
 
 init();
 
@@ -99,39 +77,6 @@ function init() {
   // EVENTS
   container.style.touchAction = 'none';
   container.addEventListener('pointerdown', onPointerDown);
-  document.addEventListener('keypress', onDocumentKeyPress);
-  document.addEventListener('keydown', onDocumentKeyDown);
-
-  const params = {
-    changeColor: function () {
-      pointLight.color.setHSL(Math.random(), 1, 0.5);
-    },
-    changeFont: function () {
-      fontIndex++;
-      fontName = reverseFontMap[fontIndex % reverseFontMap.length];
-      loadFont();
-    },
-    changeWeight: function () {
-      if (fontWeight === 'bold') {
-        fontWeight = 'regular';
-      } else {
-        fontWeight = 'bold';
-      }
-      loadFont();
-    },
-    changeBevel: function () {
-      bevelEnabled = !bevelEnabled;
-      refreshText();
-    }
-  };
-
-  const gui = new GUI();
-
-  gui.add(params, 'changeColor').name('change color');
-  gui.add(params, 'changeFont').name('change font');
-  gui.add(params, 'changeWeight').name('change weight');
-  gui.add(params, 'changeBevel').name('change bevel');
-  gui.open();
 
   window.addEventListener('resize', onWindowResize);
 }
@@ -142,36 +87,6 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-}
-
-function onDocumentKeyDown(event) {
-  if (firstLetter) {
-    firstLetter = false;
-    text = '';
-  }
-
-  const keyCode = event.keyCode;
-
-  // backspace
-  if (keyCode == 8) {
-    event.preventDefault();
-    text = text.substring(0, text.length - 1);
-    refreshText();
-    return false;
-  }
-}
-
-function onDocumentKeyPress(event) {
-  const keyCode = event.which;
-
-  // backspace
-  if (keyCode == 8) {
-    event.preventDefault();
-  } else {
-    const ch = String.fromCharCode(keyCode);
-    text += ch;
-    refreshText();
-  }
 }
 
 function loadFont() {
@@ -245,5 +160,4 @@ function animate() {
   camera.lookAt(cameraTarget);
   renderer.clear();
   renderer.render(scene, camera);
-
 }
